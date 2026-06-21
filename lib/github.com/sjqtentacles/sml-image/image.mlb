@@ -1,0 +1,5 @@
+$(SML_LIB)/basis/basis.mlb
+../sml-inflate/inflate.mlb
+../sml-color/color.mlb
+image.sig
+image.sml

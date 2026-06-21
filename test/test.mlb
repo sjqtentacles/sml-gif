@@ -1,0 +1,11 @@
+(* Test executable basis: the gif library (which pulls in the vendored
+ * sml-image + sml-inflate + sml-color) plus the harness and runner. *)
+$(SML_LIB)/basis/basis.mlb
+../src/gif.mlb
+harness.sml
+support.sml
+test_structure.sml
+test_roundtrip.sml
+test_quant.sml
+entry.sml
+main.sml

@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  POLYML_VERSION: "5.9.1"
+
+jobs:
+  mlton:
+    name: MLton (build + test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MLton
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mlton
+      - name: Run tests
+        run: make test
+
+  polyml:
+    name: Poly/ML (test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # The Ubuntu apt package is Poly/ML 5.7.1 (2017), whose X86 code generator
+      # crashes ("asGenReg raised while compiling") on heavy arithmetic code.
+      # Build a current Poly/ML from source instead, and cache the install.
+      - name: Cache Poly/ML
+        id: cache-polyml
+        uses: actions/cache@v4
+        with:
+          path: /opt/polyml
+          key: polyml-${{ env.POLYML_VERSION }}-${{ runner.os }}
+      - name: Build Poly/ML ${{ env.POLYML_VERSION }}
+        if: steps.cache-polyml.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libgmp-dev
+          curl -fsSL "https://github.com/polyml/polyml/archive/refs/tags/v${POLYML_VERSION}.tar.gz" -o polyml.tar.gz
+          tar xzf polyml.tar.gz
+          cd "polyml-${POLYML_VERSION}"
+          ./configure --prefix=/opt/polyml
+          make -j"$(nproc)"
+          make install
+      - name: Add Poly/ML to PATH
+        run: |
+          echo "/opt/polyml/bin" >> "$GITHUB_PATH"
+          echo "LD_LIBRARY_PATH=/opt/polyml/lib:${LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+      - name: Run tests
+        run: make test-poly

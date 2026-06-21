@@ -1,0 +1,7 @@
+(* MLton basis file for the sml-color library. *)
+local
+  $(SML_LIB)/basis/basis.mlb
+in
+  color.sig
+  color.sml
+end

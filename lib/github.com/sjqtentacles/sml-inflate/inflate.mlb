@@ -1,0 +1,7 @@
+(* MLton basis file for the sml-inflate library. *)
+local
+  $(SML_LIB)/basis/basis.mlb
+in
+  inflate.sig
+  inflate.sml
+end
