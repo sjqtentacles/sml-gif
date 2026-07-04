@@ -128,9 +128,18 @@ struct
 
     fun intTok (v, i) =
       let val (s, j) = token (v, i)
-      in case Int.fromString s of
-           SOME n => (n, j)
-         | NONE => raise Image "pnm: expected integer"
+      in
+        (* Parse via `IntInf` and bounds-check into the fixed 32-bit range.
+           `Int.fromString` raises `Overflow` past 2^31 on MLton (32-bit int)
+           but not on Poly/ML (63-bit int); routing through `IntInf` and
+           rejecting out-of-range header fields keeps decoding total and
+           identical on both compilers. *)
+        case IntInf.fromString s of
+          SOME n =>
+            if n >= ~2147483648 andalso n <= 2147483647
+            then (IntInf.toInt n, j)
+            else raise Image "pnm: integer out of range"
+        | NONE => raise Image "pnm: expected integer"
       end
   in
     fun decodePnm v =
