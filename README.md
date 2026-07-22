@@ -1,5 +1,7 @@
 # sml-gif
 
+[![CI](https://github.com/sjqtentacles/sml-gif/actions/workflows/ci.yml/badge.svg)](https://github.com/sjqtentacles/sml-gif/actions/workflows/ci.yml)
+
 Animated **GIF89a** encoder in pure Standard ML. Frames are
 [`sml-image`](https://github.com/sjqtentacles/sml-image) RGBA images; the encoder
 builds a global color table (exact when a sequence has &le; 256 distinct colors,
